@@ -108,7 +108,6 @@
               <td th:text="${user.email}"></td>
               <td th:text="${user.rolesAsString}"></td>
               <td>
-                <!-- Форма редактирования -->
                 <button type="button" class="btn btn-warning btn-sm"
                         data-bs-toggle="modal"
                         data-bs-target="#editModal"
@@ -117,7 +116,6 @@
                   Edit
                 </button>
 
-                <!-- Форма удаления -->
                 <form th:action="@{/admin/delete}" method="post" style="display:inline;">
                   <input type="hidden" name="id" th:value="${user.id}">
                   <button type="submit" class="btn btn-danger btn-sm"
