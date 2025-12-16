@@ -15,4 +15,96 @@
             <form th:action="@{/logout}" method="post" class="d-inline">
                 <button type="submit" class="btn btn-outline-light">Logout</button>
             </form>
-        </div
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Your Profile</h3>
+                </div>
+                <div class="card-body">
+                    <h4 class="mb-4">Hello, <span th:text="${user.firstName}">User</span>!</h4>
+
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <th style="width: 30%">First Name:</th>
+                            <td th:text="${user.firstName}">First Name</td>
+                        </tr>
+                        <tr>
+                            <th>Last Name:</th>
+                            <td th:text="${user.lastName}">Last Name</td>
+                        </tr>
+                        <tr>
+                            <th>Age:</th>
+                            <td th:text="${user.age}">Age</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td th:text="${user.email}">Email</td>
+                        </tr>
+                        <tr>
+                            <th>Roles:</th>
+                            <td>
+                                    <span th:each="role, iterStat : ${user.roles}"
+                                          class="badge bg-secondary me-1"
+                                          th:text="${role.name}">
+                                        ROLE
+                                    </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="mt-4">
+                        <div sec:authorize="hasRole('ADMIN')" class="alert alert-warning">
+                            <h5><i class="fas fa-shield-alt"></i> Administrator Access</h5>
+                            <p>You have administrator privileges. You can access the
+                                <a th:href="@{/admin}" class="alert-link">Admin Panel</a>
+                                to manage all users.</p>
+                            <a th:href="@{/admin}" class="btn btn-warning">Go to Admin Panel</a>
+                        </div>
+
+                        <div sec:authorize="!hasRole('ADMIN')" class="alert alert-info">
+                            <h5><i class="fas fa-info-circle"></i> Regular User</h5>
+                            <p>You are logged in as a regular user. Only administrators
+                                can access the admin panel.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 text-center">
+                        <a th:href="@{/}" class="btn btn-outline-primary me-2">Home</a>
+                        <button onclick="history.back()" class="btn btn-outline-secondary">Back</button>
+                    </div>
+                </div>
+                <div class="card-footer text-muted text-center">
+                    <small>User ID: <span th:text="${user.id}">1</span></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const logoutButtons = document.querySelectorAll('form[th\\:action="@{/logout}"] button');
+        logoutButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                if (!confirm('Are you sure you want to logout?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
