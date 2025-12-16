@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Admin Panel</a>
+    <div class="navbar-nav ms-auto">
+      <span class="navbar-text me-3" sec:authentication="principal.email"></span>
+      <form th:action="@{/logout}" method="post" class="d-inline">
+        <button type="submit" class="btn btn-outline-light">Logout</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-12">
+      <h2>User Management</h2>
+
+      <!-- Форма добавления пользователя -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h4>Add New User</h4>
+        </div>
+        <div class="card-body">
+          <form th:action="@{/admin/create}" method="post">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">First Name</label>
+                  <input type="text" class="form-control" th:field="*{newUser.firstName}" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Last Name</label>
+                  <input type="text" class="form-control" th:field="*{newUser.lastName}" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Age</label>
+                  <input type="number" class="form-control" th:field="*{newUser.age}">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" th:field="*{newUser.email}" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Password</label>
+              <input type="password" class="form-control" th:field="*{newUser.password}" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Roles</label>
+              <div th:each="role : ${roles}">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox"
+                         th:value="${role.id}" name="roleIds" th:id="'role_' + ${role.id}">
+                  <label class="form-check-label" th:for="'role_' + ${role.id}"
+                         th:text="${role.name}"></label>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-success">Add User</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Таблица пользователей -->
+      <div class="card">
+        <div class="card-header">
+          <h4>Users List</h4>
+        </div>
+        <div class="card-body">
+          <table class="table table-striped">
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Age</th>
+              <th>Email</th>
+              <th>Roles</th>
+              <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}">
+              <td th:text="${user.id}"></td>
+              <td th:text="${user.firstName}"></td>
+              <td th:text="${user.lastName}"></td>
+              <td th:text="${user.age}"></td>
+              <td th:text="${user.email}"></td>
+              <td th:text="${user.rolesAsString}"></td>
+              <td>
+                <!-- Форма редактирования -->
+                <button type="button" class="btn btn-warning btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editModal"
+                        th:attr="data-bs-userid=${user.id}"
+                        th:onclick="|prepareEditModal(${user.id})|">
+                  Edit
+                </button>
+
+                <!-- Форма удаления -->
+                <form th:action="@{/admin/delete}" method="post" style="display:inline;">
+                  <input type="hidden" name="id" th:value="${user.id}">
+                  <button type="submit" class="btn btn-danger btn-sm"
+                          onclick="return confirm('Are you sure?')">
+                    Delete
+                  </button>
+                </form>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно редактирования -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm" th:action="@{/admin/edit}" method="post">
+          <input type="hidden" name="id" id="editUserId">
+
+          <div class="mb-3">
+            <label class="form-label">First Name</label>
+            <input type="text" class="form-control" name="firstName" id="editFirstName" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Last Name</label>
+            <input type="text" class="form-control" name="lastName" id="editLastName" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Age</label>
+            <input type="number" class="form-control" name="age" id="editAge">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" name="email" id="editEmail" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" name="password" id="editPassword" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Roles</label>
+            <div th:each="role : ${roles}">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox"
+                       th:value="${role.id}" name="roleIds"
+                       th:id="'editRole_' + ${role.id}">
+                <label class="form-check-label"
+                       th:for="'editRole_' + ${role.id}"
+                       th:text="${role.name}"></label>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+  function prepareEditModal(userId) {
+    fetch('/admin/user/' + userId)
+            .then(response => response.json())
+            .then(user => {
+              document.getElementById('editUserId').value = user.id;
+              document.getElementById('editFirstName').value = user.firstName;
+              document.getElementById('editLastName').value = user.lastName;
+              document.getElementById('editAge').value = user.age;
+              document.getElementById('editEmail').value = user.email;
+              document.getElementById('editPassword').value = user.password;
+
+              document.querySelectorAll('#editForm input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+              });
+
+              user.roles.forEach(role => {
+                const checkbox = document.getElementById('editRole_' + role.id);
+                if (checkbox) {
+                  checkbox.checked = true;
+                }
+              });
+            })
+            .catch(error => console.error('Error:', error));
+  }
+</script>
+</body>
+</html>
