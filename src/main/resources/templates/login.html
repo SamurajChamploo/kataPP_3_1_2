@@ -20,17 +20,16 @@
           <div th:if="${param.logout}" class="alert alert-success">
             You have been logged out successfully
           </div>
-
           <form th:action="@{/process_login}" method="post">
             <div class="mb-3">
               <label for="username" class="form-label">Email:</label>
               <input type="text" class="form-control" id="username"
-                     name="username" required>
+                     name="username" value="admin@mail.ru" required>
             </div>
             <div class="mb-3">
               <label for="password" class="form-label">Password:</label>
               <input type="password" class="form-control" id="password"
-                     name="password" required>
+                     name="password" value="admin" required>
             </div>
             <div class="d-grid">
               <button type="submit" class="btn btn-primary">Login</button>

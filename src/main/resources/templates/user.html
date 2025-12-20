@@ -11,7 +11,7 @@
     <div class="container-fluid">
         <a class="navbar-brand" href="#">User Panel</a>
         <div class="navbar-nav ms-auto">
-            <span class="navbar-text me-3" sec:authentication="principal.email"></span>
+            <span class="navbar-text me-3" sec:authentication="name"></span>
             <form th:action="@{/logout}" method="post" class="d-inline">
                 <button type="submit" class="btn btn-outline-light">Logout</button>
             </form>
