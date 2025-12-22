@@ -198,7 +198,6 @@
                        th:text="${role.name}"></label>
               </div>
             </div>
-            <input type="hidden" name="roleIds" value="">
             <small class="form-text text-muted">
               At least one role must be selected
             </small>
@@ -221,34 +220,46 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 
-  // Простейший вариант без сложной логики
   function simpleEdit(button) {
-    // Получаем данные напрямую из кнопки
     const userId = button.getAttribute('data-user-id');
+    const userRoles = button.getAttribute('data-user-roles');
 
     if (!userId) {
       alert('Error: No user ID found');
       return;
     }
 
-    // Устанавливаем ID в скрытое поле
     const idInput = document.getElementById('editUserId');
     if (idInput) {
       idInput.value = userId;
       console.log('Set user ID to:', userId);
     }
 
-    // Заполняем остальные поля
     document.getElementById('editFirstName').value = button.getAttribute('data-user-firstname') || '';
     document.getElementById('editLastName').value = button.getAttribute('data-user-lastname') || '';
     document.getElementById('editAge').value = button.getAttribute('data-user-age') || '';
     document.getElementById('editEmail').value = button.getAttribute('data-user-email') || '';
 
-    // Очищаем пароль
     document.getElementById('editPassword').value = '';
+
+    const roleCheckboxes = document.querySelectorAll('.edit-role-checkbox');
+    roleCheckboxes.forEach(checkbox => {
+      checkbox.checked = false;
+    });
+
+    if (userRoles) {
+      const roleIds = userRoles.split(',').map(id => id.trim()).filter(id => id !== '');
+      roleIds.forEach(roleId => {
+        const checkbox = document.getElementById('editRole_' + roleId);
+        if (checkbox) {
+          checkbox.checked = true;
+        }
+      });
+    }
+
+    console.log('Set user roles to:', userRoles);
   }
 
-  // Назначаем обработчик прямо на кнопки
   document.addEventListener('DOMContentLoaded', function() {
     const editButtons = document.querySelectorAll('.edit-btn');
     editButtons.forEach(button => {

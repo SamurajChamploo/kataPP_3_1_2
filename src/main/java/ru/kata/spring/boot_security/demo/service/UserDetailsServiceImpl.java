@@ -26,12 +26,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         System.out.println("Looking for user with: '" + username + "'");
 
-        // Вариант 1: Ищем точное совпадение по email
         Optional<User> userOpt = userRepository.findByEmail(username);
 
-        // Вариант 2: Если не нашли, пробуем добавить домен
         if (userOpt.isEmpty() && !username.contains("@")) {
-            // Попробуем стандартные домены
             String[] domains = {"@mail.ru", "@gmail.com", "@yandex.ru"};
             for (String domain : domains) {
                 userOpt = userRepository.findByEmail(username + domain);
@@ -41,15 +38,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             }
         }
 
-        // Вариант 3: Ищем по части email
         if (userOpt.isEmpty()) {
             userOpt = userRepository.findByUsernameContaining(username);
         }
 
         User user = userOpt.orElseThrow(() -> {
-            // Логируем все попытки
             System.err.println("Failed to find user with any variation of: '" + username + "'");
-            // Выведем всех пользователей для отладки
             List<User> allUsers = userRepository.findAll();
             System.err.println("Available users: " +
                     allUsers.stream().map(User::getEmail).collect(Collectors.joining(", ")));

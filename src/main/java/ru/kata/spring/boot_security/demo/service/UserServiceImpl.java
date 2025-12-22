@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.util.StringUtils;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.repository.RoleRepository;
@@ -45,6 +46,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void saveUser(User user, Set<Long> roleIds) {
+
         Set<Role> roles = getRolesFromIds(roleIds);
         user.setRoles(roles);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -56,6 +58,7 @@ public class UserServiceImpl implements UserService {
     public void updateUser(Long id, String firstName, String lastName,
                            Integer age, String email, String password,
                            Set<Long> roleIds) {
+
 
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
@@ -72,7 +75,7 @@ public class UserServiceImpl implements UserService {
         existingUser.setAge(age);
         existingUser.setEmail(email);
 
-        if (password != null && !password.trim().isEmpty()) {
+        if (!StringUtils.isEmpty(password)) {
             if (!password.startsWith("$2a$")) {
                 existingUser.setPassword(passwordEncoder.encode(password));
             } else if (!password.equals(existingUser.getPassword())) {
@@ -84,6 +87,7 @@ public class UserServiceImpl implements UserService {
         existingUser.setRoles(roles);
 
         userRepository.save(existingUser);
+
     }
 
     @Override
@@ -101,7 +105,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
